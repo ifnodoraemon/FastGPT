@@ -21,9 +21,9 @@ FROM node:20.14.0-alpine AS builder
 WORKDIR /app
 
 COPY package.json pnpm-workspace.yaml /app/
-COPY --from=install /app/node_modules /app/node_modules
 COPY ./projects/mcp_server /app/projects/mcp_server
-COPY --from=install /app/projects/mcp_server /app/projects/mcp_server
+COPY --from=install /app/node_modules /app/node_modules
+COPY --from=install /app/projects/mcp_server/node_modules /app/projects/mcp_server/node_modules
 
 RUN npm install -g pnpm@9.4.0
 RUN pnpm --filter=mcp_server build
@@ -40,4 +40,4 @@ COPY --from=builder /app/projects/mcp_server /app/projects/mcp_server
 ENV NODE_ENV=production
 ENV PORT=3000
 
-ENTRYPOINT ["sh","-c","node projects/mcp_server/dist/index.js"]
+ENTRYPOINT ["sh","-c","node /app/projects/mcp_server/dist/index.js"]
